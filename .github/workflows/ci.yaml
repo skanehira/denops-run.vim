@@ -27,7 +27,7 @@ jobs:
     strategy:
       matrix:
         runner:
-          #- windows-latest
+          - windows-latest
           #- macos-latest
           - ubuntu-latest
         version:
@@ -64,7 +64,7 @@ jobs:
           echo "::set-output name=path::$HOME/denops.vim"
       - name: Test
         run: |
-          echo $DENOPS_PATH
+          make test
         env:
          #DENOPS_TEST_VIM: ${{ steps.vim.outputs.executable }}
           DENOPS_TEST_NVIM: ${{ steps.nvim.outputs.executable }}
