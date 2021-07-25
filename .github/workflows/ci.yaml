@@ -60,15 +60,13 @@ jobs:
       - uses: actions/checkout@v2
         id: denops
         with:
-          repository: https://github.com/vim-denops/denops.vim                
+          repository: https://github.com/vim-denops/denops.vim
           path: /tmp
-        run: |
-          echo "::set-output name=path::'/tmp/denops.vim'"
       - name: Test
         run: |
           make test
         env:
           DENOPS_TEST_VIM: ${{ steps.vim.outputs.executable }}
           DENOPS_TEST_NVIM: ${{ steps.nvim.outputs.executable }}
-          DENOPS_PATH: ${{ steps.denops.outputs.path }}
+          DENOPS_PATH: '/tmp/denops.vim'
         timeout-minutes: 5
