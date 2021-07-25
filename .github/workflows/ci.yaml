@@ -60,13 +60,10 @@ jobs:
       - name: Clone denops.vim
         id: denops
         run: |
-          git clone https://github.com/vim-denops/denops.vim
-          echo "::set-output name=path::$(pwd)"
+          git clone https://github.com/vim-denops/denops.vim $TMPDIR
+          echo "::set-output name=path::$TMPDIR"
       - name: Test
-        run: |            
-          echo $DENOPS_TEST_VIM
-          echo $DENOPS_TEST_NVIM
-          echo $DENOPS_PATH
+        run: |
           make test
         env:
           DENOPS_TEST_VIM: ${{ steps.vim.outputs.executable }}
