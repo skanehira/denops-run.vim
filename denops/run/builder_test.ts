@@ -40,11 +40,11 @@ const buildConfigTests = [
 ];
 
 for (const t of buildConfigTests) {
-  test("vim", t.name, async (denops) => {
+  test("all", t.name, async (denops) => {
     await denops.cmd(`e ${t.want.File}`);
     const got = await buildConfig(denops, t.args);
     assertEquals(got, t.want);
-    await denops.cmd(`bw!`)
+    await denops.cmd(`bw!`);
   });
 }
 
