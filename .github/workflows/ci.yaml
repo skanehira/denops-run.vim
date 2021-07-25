@@ -63,9 +63,9 @@ jobs:
           repository: vim-denops/denops.vim
       - name: Test
         run: |
-          make test
+          echo test
         env:
          #DENOPS_TEST_VIM: ${{ steps.vim.outputs.executable }}
           DENOPS_TEST_NVIM: ${{ steps.nvim.outputs.executable }}
-          DENOPS_PATH: $GITHUB_WORKSPACE/denops.vim
+          DENOPS_PATH: ${{ $GITHUB_WORKSPACE/denops.vim }}
         timeout-minutes: 5
