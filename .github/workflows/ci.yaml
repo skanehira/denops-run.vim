@@ -60,7 +60,7 @@ jobs:
       - uses: actions/checkout@v2
         id: denops
         with:
-          repository: https://github.com/vim-denops/denops.vim
+          repository: vim-denops/denops.vim
           path: /tmp
       - name: Test
         run: |
