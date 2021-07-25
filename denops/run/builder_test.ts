@@ -7,7 +7,7 @@ const buildConfigTests = [
     args: "go_run -env GOOS=linux GOARCH=amd64",
     want: {
       Type: "go",
-      Runner: "buffer",
+      Runner: "terminal",
       Cmd: "go run",
       Env: ["GOOS=linux", "GOARCH=amd64"],
       File: "tmp.go",
@@ -18,7 +18,7 @@ const buildConfigTests = [
     args: "go_run -env GOOS=linux GOARCH=amd64 -file main.go",
     want: {
       Type: "go",
-      Runner: "buffer",
+      Runner: "terminal",
       Cmd: "go run",
       File: "main.go",
       Env: ["GOOS=linux", "GOARCH=amd64"],
@@ -27,14 +27,24 @@ const buildConfigTests = [
   {
     name: "build with all option",
     args:
-      "go_run -env GOOS=linux GOARCH=amd64 -file main.go -args a b c -runner terminal",
+      "go_run -env GOOS=linux GOARCH=amd64 -file main.go -args a b c -runner buffer",
     want: {
       Type: "go",
-      Runner: "terminal",
+      Runner: "buffer",
       Cmd: "go run",
       Args: ["a", "b", "c"],
       File: "main.go",
       Env: ["GOOS=linux", "GOARCH=amd64"],
+    },
+  },
+  {
+    name: "build with no option",
+    args: "go_run",
+    want: {
+      Type: "go",
+      Runner: "terminal",
+      Cmd: "go run",
+      File: "main.go",
     },
   },
 ];
@@ -43,8 +53,8 @@ for (const t of buildConfigTests) {
   test("all", t.name, async (denops) => {
     await denops.cmd(`e ${t.want.File}`);
     const got = await buildConfig(denops, t.args);
-    assertEquals(got, t.want);
     await denops.cmd(`bw!`);
+    assertEquals(got, t.want);
   });
 }
 

@@ -11,7 +11,7 @@ export async function main(denops: Denops): Promise<void> {
         const config = await buildConfig(denops, args);
         if (config.Runner === "terminal") {
           const cmd = buildCmd(config);
-          await denops.cmd(`terminal ${cmd}`);
+          await denops.cmd(`new | terminal ${cmd}`);
         }
       }
     },

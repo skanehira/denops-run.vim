@@ -10,7 +10,7 @@ export const Cmds: {
 export const runConfig: RunConfig = {
   "go_run": {
     Type: "go",
-    Runner: "buffer",
+    Runner: "terminal",
     Cmd: "go run",
     File: "%",
   },

@@ -10,7 +10,7 @@ export async function buildConfig(
   const splitArg = arg.split(" ");
 
   const configName = splitArg[0];
-  const config = getRunConfig(configName);
+  const config = { ...getRunConfig(configName) };
   if (!config) {
     throw new Error(`not found config: ${configName}`);
   }
@@ -57,11 +57,6 @@ export async function buildConfig(
   if (config.File === "%") {
     config.File = await denops.call("bufname") as string;
   }
-  // else {
-  //   config.File = await Deno.makeTempFile();
-  //   const lines = await denops.eval("getline(1, '$')") as string[];
-  //   await Deno.writeTextFile(config.File, lines.join("\n"));
-  // }
 
   options.forEach((option) => {
     switch (option.key) {
@@ -81,6 +76,12 @@ export async function buildConfig(
         config.Cmd = option.values[0];
     }
   });
+
+  if (await denops.eval("&modified")) {
+    config.File = `${await Deno.makeTempFile()}.${config.Type}`;
+    const lines = await denops.eval("getline(1, '$')") as string[];
+    await Deno.writeTextFile(config.File, lines.join("\n"));
+  }
 
   return config;
 }
