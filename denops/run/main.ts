@@ -1,4 +1,4 @@
-import { Denops, isString } from "./deps.ts";
+import { buildCmd, buildConfig, Denops, isString } from "./deps.ts";
 
 export async function main(denops: Denops): Promise<void> {
   await denops.cmd(
@@ -8,9 +8,12 @@ export async function main(denops: Denops): Promise<void> {
   denops.dispatcher = {
     async run(args: unknown): Promise<void> {
       if (isString(args)) {
-        console.log("hello", args);
+        const config = await buildConfig(denops, args);
+        if (config.Runner === "terminal") {
+          const cmd = buildCmd(config);
+          await denops.cmd(`terminal ${cmd}`);
+        }
       }
-      await Promise.resolve();
     },
   };
 }
