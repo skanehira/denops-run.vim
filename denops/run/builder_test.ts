@@ -1,7 +1,12 @@
 import { buildCmd, buildConfig } from "./builder.ts";
-import { assertEquals, FileTypeConfig, test } from "./deps.ts";
+import {
+  assertEquals,
+  assertThrowsAsync,
+  FileTypeConfig,
+  test,
+} from "./deps.ts";
 
-const buildConfigTests = [
+const buildConfigTestsSuccess = [
   {
     name: "build with -env",
     args: "go_run -env GOOS=linux GOARCH=amd64",
@@ -27,11 +32,11 @@ const buildConfigTests = [
   {
     name: "build with all option",
     args:
-      "go_run -env GOOS=linux GOARCH=amd64 -file main.go -args a b c -runner buffer",
+      "go_run -env GOOS=linux GOARCH=amd64 -file main.go -args a b c -runner buffer -cmd go test",
     want: {
       Type: "go",
       Runner: "buffer",
-      Cmd: "go run",
+      Cmd: "go test",
       Args: ["a", "b", "c"],
       File: "main.go",
       Env: ["GOOS=linux", "GOARCH=amd64"],
@@ -48,8 +53,7 @@ const buildConfigTests = [
     },
   },
 ];
-
-for (const t of buildConfigTests) {
+for (const t of buildConfigTestsSuccess) {
   test("all", t.name, async (denops) => {
     await denops.cmd(`e ${t.want.File}`);
     const got = await buildConfig(denops, t.args);
@@ -57,6 +61,41 @@ for (const t of buildConfigTests) {
     assertEquals(got, t.want);
   });
 }
+
+const buildConfigTestsFail = [
+  {
+    name: "build with invalid args",
+    args: "go_run -env -args",
+    want: "invalid args: go_run -env -args",
+  },
+  {
+    name: "build with no exists config",
+    args: "xxx",
+    want: "not found config: xxx",
+  },
+];
+for (const t of buildConfigTestsFail) {
+  test("all", t.name, async (denops) => {
+    await assertThrowsAsync(
+      async () => {
+        await buildConfig(denops, t.args);
+      },
+      Error,
+      t.want,
+    );
+  });
+}
+
+test("all", "build with invalid buffer", async (denops) => {
+  await denops.cmd("set ft=go");
+  await assertThrowsAsync(
+    async () => {
+      await buildConfig(denops, "go_run");
+    },
+    Error,
+    "buffer is empty",
+  );
+});
 
 const buildCmdTests = [
   {
@@ -72,7 +111,6 @@ const buildCmdTests = [
     want: "GOOS=linux GOARCH=amd64 go run main.go arg",
   },
 ];
-
 buildCmdTests.forEach((test) => {
   Deno.test(test.name, () => {
     const got = buildCmd(test.config);

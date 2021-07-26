@@ -11,7 +11,7 @@ export async function buildConfig(
 
   const configName = splitArg[0];
   const config = { ...getRunConfig(configName) };
-  if (!config) {
+  if (Object.keys(config).length === 0) {
     throw new Error(`not found config: ${configName}`);
   }
 
@@ -55,7 +55,12 @@ export async function buildConfig(
   }
 
   if (config.File === "%") {
-    config.File = await denops.call("bufname") as string;
+    const filename = await denops.call("bufname") as string;
+    const modified = await denops.eval("&modified");
+    if (!filename && !modified) {
+      throw new Error(`buffer is empty`);
+    }
+    config.File = filename;
   }
 
   options.forEach((option) => {
@@ -73,17 +78,22 @@ export async function buildConfig(
         config.Runner = option.values[0] as Runner;
         break;
       case "-cmd":
-        config.Cmd = option.values[0];
+        config.Cmd = option.values.join(" ");
     }
   });
 
   if (await denops.eval("&modified")) {
-    config.File = `${await Deno.makeTempFile()}.${config.Type}`;
-    const lines = await denops.eval("getline(1, '$')") as string[];
-    await Deno.writeTextFile(config.File, lines.join("\n"));
+    config.File = await createTmp(denops, config.Type);
   }
 
   return config;
+}
+
+export async function createTmp(denops: Denops, ft: string): Promise<string> {
+  const filename = `${await Deno.makeTempFile()}.${ft}`;
+  const lines = await denops.eval("getline(1, '$')") as string[];
+  await Deno.writeTextFile(filename, lines.join("\n"));
+  return filename;
 }
 
 export function buildCmd(config: FileTypeConfig): string {
