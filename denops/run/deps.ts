@@ -5,3 +5,4 @@ export * from "https://deno.land/x/unknownutil@v1.0.0/mod.ts";
 export * from "./types.ts";
 export * from "./builder.ts";
 export * from "./config.ts";
+export * from "./util.ts";

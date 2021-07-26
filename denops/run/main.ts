@@ -1,4 +1,10 @@
-import { buildCmd, buildConfig, Denops, isString } from "./deps.ts";
+import {
+  buildCmd,
+  buildConfig,
+  Denops,
+  isString,
+  runTerminal,
+} from "./deps.ts";
 
 export async function main(denops: Denops): Promise<void> {
   await denops.cmd(
@@ -11,7 +17,7 @@ export async function main(denops: Denops): Promise<void> {
         const config = await buildConfig(denops, args);
         if (config.Runner === "terminal") {
           const cmd = buildCmd(config);
-          await denops.cmd(`new | terminal ${cmd}`);
+          await runTerminal(denops, cmd);
         }
       }
     },
